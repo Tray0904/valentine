@@ -1,481 +1,276 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Valentine?</title>
-  <style>
-    :root{
-      --bg1:#fff0f6;
-      --bg2:#ffe3ec;
-      --ink:#2b2b2b;
-      --pink:#ff4d8d;
-      --pink2:#ff7aa7;
-      --card:#ffffffcc;
-      --shadow: 0 18px 50px rgba(0,0,0,.12);
-      --radius: 22px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink);
-      background: radial-gradient(1200px 800px at 20% 15%, var(--bg2), transparent 60%),
-                  radial-gradient(900px 700px at 80% 30%, #ffeef4, transparent 55%),
-                  linear-gradient(180deg, var(--bg1), #ffffff);
-      overflow:hidden;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💌</title>
 
-    .center {
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:22px;
-    }
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:radial-gradient(circle at 20% 20%, #ffe6f0, #fff);
+  height:100vh;
+  overflow:hidden;
+}
 
-    .panel{
-      width:min(520px, 92vw);
-      background:var(--card);
-      border: 1px solid rgba(255,255,255,.6);
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
-      padding: 26px 22px;
-      backdrop-filter: blur(10px);
-      text-align:center;
-      position:relative;
-    }
+.screen{display:none}
+.screen.active{display:block}
 
-    .title{
-      font-size: clamp(22px, 4.2vw, 30px);
-      font-weight: 800;
-      margin: 0 0 10px;
-      letter-spacing: .2px;
-    }
-    .sub{
-      margin:0 0 18px;
-      opacity:.85;
-      font-size: 15px;
-    }
+.center{
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
 
-    /* Screens */
-    .screen{display:none}
-    .screen.active{display:block}
+.panel{
+  background:#ffffffcc;
+  backdrop-filter:blur(10px);
+  padding:24px;
+  border-radius:22px;
+  width:min(520px,92vw);
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+  text-align:center;
+  z-index:2;
+}
 
-    /* Start button */
-    .startBtn{
-      margin-top: 16px;
-      border:0;
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:white;
-      padding: 14px 18px;
-      border-radius: 999px;
-      font-size: 16px;
-      font-weight: 700;
-      box-shadow: 0 12px 30px rgba(255,77,141,.35);
-      cursor:pointer;
-      transition: transform .12s ease;
-    }
-    .startBtn:active{transform: scale(.98)}
+h1,h2{margin:.4em 0}
 
-    /* Envelope */
-    .stage{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      align-items:center;
-      justify-content:center;
-      padding: 8px 0 4px;
-    }
+button{
+  border:none;
+  padding:14px 22px;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
 
-    .envelopeWrap{
-      width:min(380px, 86vw);
-      height:240px;
-      position:relative;
-      margin: 0 auto;
-      cursor:pointer;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
+.startBtn{
+  background:linear-gradient(135deg,#ff4d8d,#ff7aa7);
+  color:white;
+}
 
-    .env{
-      position:absolute;
-      inset:0;
-      border-radius: 18px;
-      background: #ffd1e0;
-      box-shadow: 0 18px 40px rgba(0,0,0,.12);
-      overflow:hidden;
-    }
+/* ENVELOPE */
+.envelope{
+  width:320px;
+  height:220px;
+  background:#ffd1e0;
+  border-radius:18px;
+  position:relative;
+  margin:20px auto;
+  cursor:pointer;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
 
-    /* back */
-    .envBack{
-      position:absolute;
-      inset:0;
-      background: linear-gradient(180deg, #ffd6e6, #ffc1d7);
-    }
+.flap{
+  position:absolute;
+  width:100%;
+  height:55%;
+  background:#ff9fc2;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top;
+  transition:.8s;
+}
 
-    /* flap */
-    .flap{
-      position:absolute;
-      left:0; right:0;
-      top:0;
-      height: 55%;
-      background: linear-gradient(180deg, #ffb3cd, #ff9fc2);
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
-      transform-origin: 50% 0%;
-      transform: rotateX(0deg);
-      transition: transform 700ms cubic-bezier(.2,.8,.2,1);
-      z-index:4;
-    }
+.envelope.open .flap{
+  transform:rotateX(180deg);
+}
 
-    /* front triangles */
-    .frontLeft, .frontRight{
-      position:absolute;
-      top: 40%;
-      bottom:0;
-      width: 55%;
-      background: #ffb8d0;
-      z-index:5;
-    }
-    .frontLeft{
-      left:0;
-      clip-path: polygon(0 0, 100% 60%, 0 100%);
-      background: linear-gradient(135deg, #ffb9d1, #ff9fc2);
-    }
-    .frontRight{
-      right:0;
-      clip-path: polygon(100% 0, 100% 100%, 0 60%);
-      background: linear-gradient(225deg, #ffb9d1, #ff9fc2);
-    }
-    .frontBottom{
-      position:absolute;
-      left:0; right:0;
-      bottom:0;
-      height: 62%;
-      background: linear-gradient(180deg, #ffb9d1, #ff9cbf);
-      clip-path: polygon(0 0, 100% 0, 50% 60%);
-      z-index:6;
-      opacity:.25;
-      pointer-events:none;
-    }
+.letter{
+  position:absolute;
+  background:white;
+  width:80%;
+  height:70%;
+  left:10%;
+  bottom:10%;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.8s;
+}
 
-    /* letter */
-    .letter{
-      position:absolute;
-      left: 10%;
-      width: 80%;
-      bottom: 8%;
-      height: 78%;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 12px 26px rgba(0,0,0,.12);
-      transform: translateY(28%) scale(.98);
-      transition: transform 750ms cubic-bezier(.2,.8,.2,1);
-      z-index:3;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 18px;
-    }
+.envelope.open .letter{
+  transform:translateY(-30%);
+}
 
-    .seal{
-      position:absolute;
-      left:50%;
-      top: 56%;
-      transform: translate(-50%, -50%);
-      width: 56px;
-      height: 56px;
-      background: radial-gradient(circle at 30% 30%, #ff7aa7, #ff2f7b);
-      border-radius: 999px;
-      z-index:7;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:white;
-      font-size: 22px;
-      box-shadow: 0 12px 26px rgba(255,47,123,.35);
-    }
+/* FLOATING IMAGES */
+.floatPics{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
 
-    .hint{
-      font-size: 14px;
-      opacity:.8;
-      margin:0;
-    }
+.polaroid{
+  position:absolute;
+  width:120px;
+  height:160px;
+  background:white;
+  border-radius:14px;
+  box-shadow:0 16px 30px rgba(0,0,0,.2);
+  overflow:hidden;
+  animation:float 4s ease-in-out infinite;
+}
 
-    /* Open state */
-    .opened .flap{transform: rotateX(165deg)}
-    .opened .letter{transform: translateY(-18%) scale(1.02)}
+.polaroid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
-    /* Question screen */
-    .art{
-      font-size: 64px;
-      line-height:1;
-      margin-top: 6px;
-      margin-bottom: 10px;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.12));
-    }
-    .question{
-      font-size: clamp(20px, 4vw, 28px);
-      font-weight: 850;
-      margin: 6px 0 14px;
-    }
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
 
-    .btnRow{
-      position:relative;
-      height: 86px;
-      margin-top: 10px;
-    }
-    .btn{
-      border:0;
-      padding: 12px 18px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 16px;
-      cursor:pointer;
-      transition: transform .12s ease;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn:active{transform: scale(.98)}
+.p1{left:5%;top:10%;transform:rotate(-8deg)}
+.p2{right:6%;top:14%;transform:rotate(7deg)}
+.p3{left:8%;bottom:14%;transform:rotate(6deg)}
+.p4{right:8%;bottom:12%;transform:rotate(-6deg)}
 
-    .yes{
-      background: linear-gradient(135deg, #3ad66a, #10b981);
-      color:white;
-      box-shadow: 0 12px 26px rgba(16,185,129,.25);
-    }
+.question{
+  font-size:26px;
+  font-weight:800;
+}
 
-    .no{
-      position:absolute;
-      left: 55%;
-      top: 8px;
-      background: linear-gradient(135deg, #ff5d88, #ff2f7b);
-      color:white;
-      box-shadow: 0 12px 26px rgba(255,47,123,.25);
-      touch-action:none;
-    }
+.btnRow{
+  position:relative;
+  height:80px;
+}
 
-    .shyText{
-      margin: 10px 0 0;
-      font-size: 14px;
-      opacity:0;
-      transition: opacity .25s ease;
-    }
-    .shyText.show{opacity:.85}
+.yes{
+  background:#22c55e;
+  color:white;
+  position:absolute;
+  left:20%;
+}
 
-    /* Yes screen */
-    .yay{
-      font-size: clamp(28px, 6vw, 40px);
-      font-weight: 900;
-      margin: 6px 0 10px;
-      color: #ff2f7b;
-      text-shadow: 0 10px 24px rgba(255,47,123,.25);
-    }
-    .small{
-      margin:0;
-      opacity:.85;
-    }
+.no{
+  background:#ff4d8d;
+  color:white;
+  position:absolute;
+  right:20%;
+}
 
-    /* Floating hearts */
-    .hearts{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      overflow:hidden;
-      z-index:9999;
-    }
-    .heart{
-      position:absolute;
-      font-size: 20px;
-      opacity: .95;
-      animation: floatUp 2.6s linear forwards;
-      transform: translate(-50%, -50%);
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,.12));
-    }
-    @keyframes floatUp{
-      from{ transform: translate(-50%, 0) scale(1); opacity:.95;}
-      to{ transform: translate(-50%, -120vh) scale(1.6); opacity:0;}
-    }
+.shy{opacity:.7;font-size:14px}
 
-    /* Footer note */
-    .tiny{
-      margin-top: 14px;
-      font-size: 12px;
-      opacity:.6;
-    }
-  </style>
+/* YES */
+video{
+  width:100%;
+  border-radius:16px;
+  margin-top:12px;
+}
+
+.unmute{
+  margin-top:8px;
+  background:#eee;
+}
+
+/* HEARTS */
+.heart{
+  position:fixed;
+  font-size:22px;
+  animation:rise 2.6s linear forwards;
+}
+
+@keyframes rise{
+  from{transform:translateY(0);opacity:1}
+  to{transform:translateY(-100vh);opacity:0}
+}
+</style>
 </head>
+
 <body>
-  <div class="center">
-    <div class="panel">
-      <!-- START SCREEN -->
-      <div id="screenStart" class="screen active">
-        <h1 class="title">You’ve got mail 💌</h1>
-        <p class="sub">Tap the button to open a special envelope.</p>
-        <button id="startBtn" class="startBtn">Open the envelope</button>
-        <p class="tiny">Tip: Works on phone + desktop.</p>
-      </div>
 
-      <!-- ENVELOPE SCREEN -->
-      <div id="screenEnvelope" class="screen">
-        <h2 class="title" style="margin-bottom:6px;">Tap the envelope</h2>
-        <p class="sub" style="margin-top:0;">(it opens 😌)</p>
+<div class="floatPics" id="floatPics">
+  <div class="polaroid p1"><img src="assets/p1.jpg"></div>
+  <div class="polaroid p2"><img src="assets/p2.jpg"></div>
+  <div class="polaroid p3"><img src="assets/p3.jpg"></div>
+  <div class="polaroid p4"><img src="assets/p4.jpg"></div>
+</div>
 
-        <div id="envelopeWrap" class="envelopeWrap" aria-label="Envelope">
-          <div class="env">
-            <div class="envBack"></div>
-            <div class="letter">
-              <p class="hint">A little something for you…</p>
-            </div>
-            <div class="flap"></div>
-            <div class="frontLeft"></div>
-            <div class="frontRight"></div>
-            <div class="frontBottom"></div>
-            <div class="seal">❤</div>
-          </div>
-        </div>
+<div class="center">
 
-        <p class="tiny">Tap again after it opens.</p>
-      </div>
+<div class="panel">
 
-      <!-- QUESTION SCREEN -->
-      <div id="screenQuestion" class="screen">
-        <div class="art">🧸💖</div>
-        <div class="question">Will you be my Valentine?</div>
+<!-- START -->
+<div class="screen active" id="start">
+  <h1>You’ve got mail 💌</h1>
+  <button class="startBtn" onclick="go('env')">Open envelope</button>
+</div>
 
-        <div class="btnRow" id="btnRow">
-          <button id="yesBtn" class="btn yes" style="position:absolute; left: 18%; top: 8px;">Yes</button>
-          <button id="noBtn" class="btn no">No</button>
-        </div>
-
-        <p id="shyText" class="shyText">no seems to be a bit shy</p>
-      </div>
-
-      <!-- YES SCREEN -->
-      <div id="screenYes" class="screen">
-        <div class="art">💗💗💗</div>
-        <div class="yay">YAYYYY!!</div>
-        <p class="small">I knew you’d say yes 😭🫶</p>
-      </div>
-    </div>
+<!-- ENVELOPE -->
+<div class="screen" id="env">
+  <h2>Tap the envelope</h2>
+  <div class="envelope" id="envBox">
+    <div class="flap"></div>
+    <div class="letter">💖</div>
   </div>
+</div>
 
-  <div class="hearts" id="hearts"></div>
+<!-- QUESTION -->
+<div class="screen" id="q">
+  <div class="question">Will you be my Valentine, Sophia?</div>
+  <div class="btnRow">
+    <button class="yes" onclick="yes()">Yes</button>
+    <button class="no" id="no">No</button>
+  </div>
+  <p class="shy" id="shy">no seems to be a bit shy</p>
+</div>
 
-  <script>
-    const screenStart = document.getElementById('screenStart');
-    const screenEnvelope = document.getElementById('screenEnvelope');
-    const screenQuestion = document.getElementById('screenQuestion');
-    const screenYes = document.getElementById('screenYes');
+<!-- YES -->
+<div class="screen" id="yes">
+  <h1>YAYYYY 💖</h1>
+  <video id="vid" muted autoplay playsinline controls>
+    <source src="assets/Snapchat-1988701673.mp4" type="video/mp4">
+  </video>
+  <button class="unmute" onclick="unmute()">🔊 Unmute</button>
+</div>
 
-    const startBtn = document.getElementById('startBtn');
-    const envelopeWrap = document.getElementById('envelopeWrap');
+</div>
+</div>
 
-    const yesBtn = document.getElementById('yesBtn');
-    const noBtn = document.getElementById('noBtn');
-    const btnRow = document.getElementById('btnRow');
-    const shyText = document.getElementById('shyText');
+<script>
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-    const heartsLayer = document.getElementById('hearts');
+document.getElementById('envBox').onclick=()=>{
+  document.getElementById('envBox').classList.add('open');
+  setTimeout(()=>go('q'),900);
+}
 
-    function show(screen){
-      [screenStart, screenEnvelope, screenQuestion, screenYes].forEach(s => s.classList.remove('active'));
-      screen.classList.add('active');
-    }
+const no=document.getElementById('no');
+no.onmouseover=()=>{
+  no.style.left=Math.random()*60+'%';
+  no.style.top=Math.random()*40+'px';
+  document.getElementById('shy').style.opacity=1;
+}
 
-    // Start -> Envelope
-    startBtn.addEventListener('click', () => show(screenEnvelope));
+function yes(){
+  go('yes');
+  for(let i=0;i<30;i++){
+    let h=document.createElement('div');
+    h.className='heart';
+    h.innerText='💖';
+    h.style.left=Math.random()*100+'vw';
+    h.style.bottom='0';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2600);
+  }
+}
 
-    // Envelope open logic
-    let opened = false;
-    envelopeWrap.addEventListener('click', () => {
-      if (!opened){
-        envelopeWrap.classList.add('opened');
-        opened = true;
-      } else {
-        show(screenQuestion);
-        // Place the No button somewhere initially
-        placeNoRandom();
-      }
-    });
+function unmute(){
+  const v=document.getElementById('vid');
+  v.muted=false;
+  v.play();
+}
+</script>
 
-    // NO button: dodge mouse/touch
-    function placeNoRandom(){
-      const rowRect = btnRow.getBoundingClientRect();
-      const btnRect = noBtn.getBoundingClientRect();
-
-      // Random position inside row, with padding
-      const pad = 8;
-      const maxX = Math.max(pad, rowRect.width - btnRect.width - pad);
-      const maxY = Math.max(pad, rowRect.height - btnRect.height - pad);
-
-      const x = pad + Math.random() * (maxX - pad);
-      const y = pad + Math.random() * (maxY - pad);
-
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-    }
-
-    function dodge(){
-      shyText.classList.add('show');
-      placeNoRandom();
-      burstHearts(6);
-    }
-
-    // Desktop hover
-    noBtn.addEventListener('mouseenter', dodge);
-
-    // Mobile: if they try to tap it, it moves
-    noBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      dodge();
-    }, {passive:false});
-
-    // If they click anyway (unlikely), still dodge
-    noBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      dodge();
-    });
-
-    // YES button
-    yesBtn.addEventListener('click', () => {
-      show(screenYes);
-      shyText.classList.remove('show');
-      megaHearts();
-    });
-
-    // Hearts effects
-    function spawnHeart(x, y){
-      const el = document.createElement('div');
-      el.className = 'heart';
-      el.textContent = Math.random() < 0.5 ? '💗' : '💖';
-      el.style.left = x + 'px';
-      el.style.top = y + 'px';
-      el.style.fontSize = (16 + Math.random()*18) + 'px';
-      heartsLayer.appendChild(el);
-      setTimeout(()=> el.remove(), 2800);
-    }
-
-    function burstHearts(count){
-      const cx = window.innerWidth/2;
-      const cy = window.innerHeight/2;
-      for(let i=0;i<count;i++){
-        const x = cx + (Math.random()*200 - 100);
-        const y = cy + (Math.random()*120 - 60);
-        setTimeout(()=> spawnHeart(x, y), i*40);
-      }
-    }
-
-    function megaHearts(){
-      let i = 0;
-      const timer = setInterval(() => {
-        const x = 80 + Math.random()*(window.innerWidth-160);
-        const y = window.innerHeight - 60;
-        spawnHeart(x, y);
-        i++;
-        if(i > 70) clearInterval(timer);
-      }, 40);
-    }
-  </script>
 </body>
 </html>
