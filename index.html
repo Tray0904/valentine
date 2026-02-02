@@ -1,1 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine 💌</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:radial-gradient(circle at 20% 20%, #ffe6f0, #fff);
+  height:100vh;
+  overflow:hidden;
+}
+
+.screen{display:none}
+.screen.active{display:block}
+
+.center{
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  position:relative;
+}
+
+.panel{
+  background:#ffffffcc;
+  backdrop-filter:blur(10px);
+  padding:24px;
+  border-radius:22px;
+  width:min(520px,92vw);
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+  text-align:center;
+  z-index:2;
+}
+
+h1,h2{margin:.4em 0}
+
+button{
+  border:none;
+  padding:14px 22px;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.startBtn{
+  background:linear-gradient(135deg,#ff4d8d,#ff7aa7);
+  color:white;
+}
+
+/* ENVELOPE */
+.envelope{
+  width:320px;
+  height:220px;
+  background:#ffd1e0;
+  border-radius:18px;
+  position:relative;
+  margin:20px auto;
+  cursor:pointer;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.flap{
+  position:absolute;
+  width:100%;
+  height:55%;
+  background:#ff9fc2;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  transform-origin:top;
+  transition:.8s;
+}
+
+.envelope.open .flap{
+  transform:rotateX(180deg);
+}
+
+.letter{
+  position:absolute;
+  background:white;
+  width:80%;
+  height:70%;
+  left:10%;
+  bottom:10%;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.8s;
+}
+
+.envelope.open .letter{
+  transform:translateY(-30%);
+}
+
+/* FLOATING IMAGES */
+.floatPics{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.polaroid{
+  position:absolute;
+  width:120px;
+  height:160px;
+  background:white;
+  border-radius:14px;
+  box-shadow:0 16px 30px rgba(0,0,0,.2);
+  overflow:hidden;
+  animation:float 4s ease-in-out infinite;
+}
+
+.polaroid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+
+.p1{left:5%;top:10%;transform:rotate(-8deg)}
+.p2{right:6%;top:14%;transform:rotate(7deg)}
+.p3{left:8%;bottom:14%;transform:rotate(6deg)}
+.p4{right:8%;bottom:12%;transform:rotate(-6deg)}
+
+.question{
+  font-size:26px;
+  font-weight:800;
+}
+
+.btnRow{
+  position:relative;
+  height:80px;
+}
+
+.yes{
+  background:#22c55e;
+  color:white;
+  position:absolute;
+  left:20%;
+}
+
+.no{
+  background:#ff4d8d;
+  color:white;
+  position:absolute;
+  right:20%;
+}
+
+.shy{opacity:.7;font-size:14px}
+
+/* YES */
+video{
+  width:100%;
+  border-radius:16px;
+  margin-top:12px;
+}
+
+.unmute{
+  margin-top:8px;
+  background:#eee;
+}
+
+/* HEARTS */
+.heart{
+  position:fixed;
+  font-size:22px;
+  animation:rise 2.6s linear forwards;
+}
+
+@keyframes rise{
+  from{transform:translateY(0);opacity:1}
+  to{transform:translateY(-100vh);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<div class="floatPics" id="floatPics">
+  <div class="polaroid p1"><img src="assets/p1.jpg"></div>
+  <div class="polaroid p2"><img src="assets/p2.jpg"></div>
+  <div class="polaroid p3"><img src="assets/p3.jpg"></div>
+  <div class="polaroid p4"><img src="assets/p4.jpg"></div>
+</div>
+
+<div class="center">
+
+<div class="panel">
+
+<!-- START -->
+<div class="screen active" id="start">
+  <h1>You’ve got mail 💌</h1>
+  <button class="startBtn" onclick="go('env')">Open envelope</button>
+</div>
+
+<!-- ENVELOPE -->
+<div class="screen" id="env">
+  <h2>Tap the envelope</h2>
+  <div class="envelope" id="envBox">
+    <div class="flap"></div>
+    <div class="letter">💖</div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div class="screen" id="q">
+  <div class="question">Will you be my Valentine, Sophia?</div>
+  <div class="btnRow">
+    <button class="yes" onclick="yes()">Yes</button>
+    <button class="no" id="no">No</button>
+  </div>
+  <p class="shy" id="shy">no seems to be a bit shy</p>
+</div>
+
+<!-- YES -->
+<div class="screen" id="yes">
+  <h1>YAYYYY 💖</h1>
+  <video id="vid" muted autoplay playsinline controls>
+    <source src="assets/Snapchat-1988701673.mp4" type="video/mp4">
+  </video>
+  <button class="unmute" onclick="unmute()">🔊 Unmute</button>
+</div>
+
+</div>
+</div>
+
+<script>
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+document.getElementById('envBox').onclick=()=>{
+  document.getElementById('envBox').classList.add('open');
+  setTimeout(()=>go('q'),900);
+}
+
+const no=document.getElementById('no');
+no.onmouseover=()=>{
+  no.style.left=Math.random()*60+'%';
+  no.style.top=Math.random()*40+'px';
+  document.getElementById('shy').style.opacity=1;
+}
+
+function yes(){
+  go('yes');
+  for(let i=0;i<30;i++){
+    let h=document.createElement('div');
+    h.className='heart';
+    h.innerText='💖';
+    h.style.left=Math.random()*100+'vw';
+    h.style.bottom='0';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2600);
+  }
+}
+
+function unmute(){
+  const v=document.getElementById('vid');
+  v.muted=false;
+  v.play();
+}
+</script>
+
+</body>
+</html>
 
